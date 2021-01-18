@@ -4,22 +4,17 @@
 # @File    : Preprocessing.py
 # @Intro   : 读取数据集，划分训练集、测试集、验证集等
 
-from .LR_Config import LrConfig
+from LR_Config import LrConfig
 from sklearn import model_selection
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-from sklearn.externals import joblib
 import jieba
 import numpy as np
 
-config = LrConfig()
-
 
 class DataProcess(object):
-    def __init__(self, dataset_path=None, stopwords_path=None, model_save_path=None):
+    def __init__(self, dataset_path=None, stopwords_path=None):
         self.dataset_path = dataset_path
         self.stopwords_path = stopwords_path
-        self.model_save_path = model_save_path
 
     def read_data(self):
         """读取数据"""
@@ -80,3 +75,10 @@ class DataProcess(object):
             start_id = i*batch_size
             end_id = min((i+1)*batch_size, data_len)
             yield x_shuffle[start_id: end_id], y_shuffle[start_id: end_id]
+
+
+if __name__ == "__main__":
+    config = LrConfig()
+    data_get = DataProcess(config.dataset_path, config.stopwords_path)
+    X_train, X_test, y_train, y_test = data_get.provide_data()
+    print(len(X_train))
