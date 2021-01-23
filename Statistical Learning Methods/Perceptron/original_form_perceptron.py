@@ -16,27 +16,28 @@
 """
 
 import os
-import sys
+import numpy as np
+from matplotlib import pyplot as plt
 
-# An example in that book, the training set and parameters' sizes are fixed
+# 初始化参数
 training_set = []
 
 w = []
 b = 0
-lens = 0
+lens = 0  # 权重向量维度（输入数据的维度，即网络的结点数）
 n = 0
 
 
-# update parameters using stochastic gradient descent
-def update(item):
+# 通过SGD更新参数
+def update(item,k):
     global w, b, lens, n
     for i in range(lens):
         w[i] = w[i] + n * item[1] * item[0][i]
     b = b + n * item[1]
-    print(w, b)  # you can uncomment this line to check the process of stochastic gradient descent
+    print("第"+str(k)+"次更新权重: w: " + str(w) + " b: " + str(b))
 
 
-# calculate the functional distance between 'item' an the dicision surface
+# 计算item与决策面之间的距离（不考虑1/||w||）：-y(wx+b)
 def cal(item):
     global w, b
     res = 0
@@ -47,19 +48,43 @@ def cal(item):
     return res
 
 
-# check if the hyperplane can classify the examples correctly
-def check():
-    flag = False
+# 检查超平面是否可以正确地分类这些数据
+def check(k):
+    flag = False  # 是否需要更新
     for item in training_set:
         if cal(item) <= 0:
             flag = True
-            update(item)
+            update(item,k)
     if not flag:  # False
         print("RESULT: w: " + str(w) + " b: " + str(b))
-        tmp = ''
-        for keys in w:
-            tmp += str(keys) + ' '
-        tmp = tmp.strip()
+
+        # 绘制结果
+        datas = np.array(training_set)
+        plt.title("Perceptron Result")
+        plt.xlabel("x1 axis")
+        plt.ylabel("x2 axis")
+        x_end = []
+        for i in datas[:, 0]:
+            plt.scatter(i[0], i[1])
+            x_end.append(i[0])
+
+        x_end = np.array(x_end)
+        y_end = (1/w[0])*(-b - w[1]*x_end)
+        print(y_end)
+        plt.plot(x_end, y_end)
+        plt.show()
 
         os._exit(0)
-    flag = False
+
+
+if __name__ == "__main__":
+    training_set = [[[3, 3], 1],
+                    [[4, 3], 1],
+                    [[1, 1], -1]]
+    lens = 2
+    n = 1
+    for i in range(lens):
+        w.append(0)
+
+    for i in range(1000):
+        check(i+1)
