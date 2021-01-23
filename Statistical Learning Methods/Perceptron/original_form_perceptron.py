@@ -70,7 +70,6 @@ def check(k):
 
         x_end = np.array(x_end)
         y_end = (1/w[0])*(-b - w[1]*x_end)
-        print(y_end)
         plt.plot(x_end, y_end)
         plt.show()
 
@@ -82,7 +81,7 @@ if __name__ == "__main__":
                     [[4, 3], 1],
                     [[1, 1], -1]]
     lens = 2
-    n = 1
+    n = 0.5
     for i in range(lens):
         w.append(0)
 
