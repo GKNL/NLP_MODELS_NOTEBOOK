@@ -32,7 +32,6 @@ class NaiveBayes():
         allPropByFeature = {}  # 对于每一种属性，有几种可取的值（用于后续的laplace平滑）
         for nameFeature in propNamesAll:
             allPropByFeature[nameFeature] = list(x_train[nameFeature].value_counts().index)
-        print(allPropByFeature)
 
         # 按标签值进行分组
         for nameClass, group in x_train.groupby(x_train.columns[-1]):
@@ -55,10 +54,34 @@ class NaiveBayes():
         self.modelDic = retModel
         return retModel
 
+    def predict(self, data):
+        curMaxRate = None
+        curClassSelect = None
+        for yClass, classInfo in self.modelDic.items():
+            Py_x = 0
+            Py = np.log(classInfo['PClass'])
+            Px_y = classInfo['PFeature']
+            for nameFeature, val in data.items():
+                propsRate = Px_y.get(nameFeature)
+                if not propsRate:
+                    continue
+                Py_x += np.log(propsRate.get(val, 0))  # 使用log加法避免很小的小数连续乘，接近零
+            Py_x += Py
+            if curMaxRate == None or Py_x > curMaxRate:
+                curMaxRate = Py_x
+                curClassSelect = yClass
+        return curClassSelect
+
 
 if __name__ == "__main__":
     dataTrain = pd.read_csv("train.csv", encoding="gbk",sep='\t')
     yTrain = dataTrain.iloc[:, -1]
     model = NaiveBayes()
     model.fit(dataTrain, yTrain)
+    print(model.modelDic)
+    # 对data的每一行（即每个样本）进行预测
+    preResult = dataTrain.apply(lambda d: model.predict(d), axis=1)
+    pd = pd.DataFrame({'预测值': preResult, '正取值': dataTrain.iloc[:, -1]})
+    print(pd)
+    print('正确率:%f%%' % (pd[pd['预测值'] == pd['正取值']].shape[0] * 100.0 / pd.shape[0]))
 
