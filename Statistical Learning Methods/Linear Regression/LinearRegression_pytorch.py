@@ -43,15 +43,15 @@ class LinearNet(nn.Module):
         return y
 
 net = LinearNet(num_inputs)
-# 写法二
+# # 写法二
 # net = nn.Sequential()
 # net.add_module('linear', nn.Linear(num_inputs, 1))
-# net.add_module ......
+# # net.add_module ......
 print(net) # 使用print可以打印出网络的结构
 
 # 查看模型参数（可以看到有两个Tensor：一个是w，一个是偏置b）
 for param in net.parameters():
-    print(param)
+    print(param.size())
 
 """
 初始化模型参数
@@ -84,5 +84,6 @@ for epoch in range(1, num_epochs + 1):
         l = loss(output, y.view(-1, 1))
         optimizer.zero_grad() # 梯度清零，等价于net.zero_grad()
         l.backward()
+        # 对optimizer实例调用step函数，从而更新权重和偏差
         optimizer.step()
     print('epoch %d, loss: %f' % (epoch, l.item()))
