@@ -27,17 +27,16 @@ def train():
     model = TextRNN()
     # 选择损失函数
     Loss = nn.MultiLabelSoftMarginLoss()
+    # Loss = nn.CrossEntropyLoss()
     # Loss = nn.BCELoss()
     # Loss = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
     best_val_acc = 0
     for epoch in range(100):
         i = 0
-        print('epoch:{}'.format(epoch))
         batch_train = batch_iter(x_train, y_train,64)
         for x_batch, y_batch in batch_train:
             i += 1
-            print(i)
             optimizer.zero_grad()
 
             x = np.array(x_batch)
@@ -46,12 +45,14 @@ def train():
             y = torch.Tensor(y)
             out = model(x)
             loss = Loss(out,y)
+            print('epoch:{}, round:{}, Train Loss:{}'.format(epoch + 1, i, loss))
+
             loss.backward()
             optimizer.step()
 
             # 对模型进行验证
-            if i % 90 == 0:
-                los, accracy = evaluate(model, Loss, optimizer, x_val, y_val)
+            if i % 70 == 0:
+                los, accracy = evaluate(model, Loss, x_val, y_val)
                 print('loss:{},accracy:{}'.format(los, accracy))
                 if accracy > best_val_acc:
                     torch.save(model.state_dict(), 'model_params.pkl')
@@ -86,5 +87,5 @@ if __name__ == '__main__':
     words, word_to_id = read_vocab(vocab_dir)
     # 获取字数
     vocab_size = len(words)
-    print('train')
+    print('Train Begin')
     train()

@@ -15,7 +15,7 @@ class TextRNN(nn.Module):
     def __init__(self):
         super(TextRNN, self).__init__()
         # 三个待输入的数据
-        self.embedding = nn.Embedding(5000, 64)  # 进行词嵌入[这里正好字典中有5000个字]
+        self.embedding = nn.Embedding(5000, 64)  # 使用随机初始化的方式进行词嵌入[这里正好字典中有5000个字]
         self.rnn = nn.LSTM(input_size=64, hidden_size=128, bidirectional=True)  # hidden_size　隐层状态的维数：（每个LSTM单元或者时间步的输出的ht的维度，单元内部有权重与偏差计算）
         self.f1 = nn.Sequential(nn.Linear(256, 10),
                                 nn.Softmax())  # 全连接层
